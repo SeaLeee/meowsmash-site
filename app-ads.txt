@@ -1,0 +1,2 @@
+# AdMob app-ads.txt — replace pub-XXXXXXXXXXXXXXXX with your AdMob publisher ID (AdMob → Settings → Account information).
+# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
