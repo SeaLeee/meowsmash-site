@@ -1,0 +1,74 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>喵击球 · 扭蛋管理后台</title><link rel="stylesheet" href="style.css">
+<style>
+input,select,textarea{background:#120E1A;color:var(--cream);border:2px solid #41365F;border-radius:4px;padding:6px 8px;font:inherit}
+input[type=number]{width:80px}button{background:var(--gold);color:var(--ink);border:0;border-radius:4px;padding:8px 14px;font-weight:700;cursor:pointer}
+button.ghost{background:#41365F;color:var(--cream)}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0}
+table{width:100%;border-collapse:collapse}td,th{padding:5px 6px;border-bottom:1px solid #41365F;text-align:left;font-size:14px}
+.err{color:#ff7a7a}.ok{color:var(--cyan)}#login{max-width:420px}.hidden{display:none}
+</style></head><body><div class="wrap">
+<header><img src="icon.png" alt=""><div><h1>扭蛋管理后台</h1><div class="muted">所有修改实时同步到游戏（签名下发）并在 <a href="/gacha">概率公示</a> 页公开</div></div></header>
+<div id="login" class="card"><p>输入管理员令牌（ADMIN_TOKEN）</p><div class="row"><input id="tok" type="password" style="flex:1" autocomplete="off"><button onclick="login()">登录</button></div><p id="lmsg" class="err"></p></div>
+<div id="main" class="hidden">
+  <div class="card"><h2>当前概率（立即生效）</h2>
+    <div class="row">SSR <input id="SSR" type="number" step="0.1">% SR <input id="SR" type="number" step="0.1">% R <input id="R" type="number" step="0.1">% N <input id="N" type="number" step="0.1">% <span id="sum" class="muted"></span></div>
+    <div class="row">保底抽数 <input id="pity" type="number"> UP 占比 <input id="rateUp" type="number" step="0.05" min="0.5" max="1"> <label><input id="gam" type="checkbox"> 歪了下次必中</label></div>
+    <p class="muted">安全规则：降低 SSR/SR 或提高保底（对玩家不利）不能立即生效，必须用下面的「预约变更」且至少提前 72 小时公示。范围限制：SSR 1–10%，SR 5–25%，保底 10–90。</p></div>
+  <div class="card"><h2>预约变更</h2><div id="sched"></div>
+    <div class="row">生效时间 <input id="sFrom" type="datetime-local"> SSR <input id="sSSR" type="number" step="0.1"> SR <input id="sSR2" type="number" step="0.1"> R <input id="sR" type="number" step="0.1"> N <input id="sN" type="number" step="0.1"> 保底 <input id="sPity" type="number"> <button class="ghost" onclick="addSched()">添加</button></div></div>
+  <div class="card"><h2>每周 UP（周一 00:00 北京时间切换）</h2>
+    <div class="row"><label><input id="auto" type="checkbox"> 自动轮换（未手动指定的周按 SSR 池随机轮换、不连续重复）</label></div>
+    <div class="row">不参与自动轮换：<span id="excl"></span></div>
+    <table id="weeks"></table></div>
+  <div class="card"><h2>活动（SSR 概率加成）</h2>
+    <div class="row"><label><input id="amb" type="checkbox"> 自动「月末狂欢」：每月最后一个周六日 SSR +1%</label></div>
+    <div id="evs"></div>
+    <div class="row">标题 <input id="eT" style="width:200px"> 开始 <input id="eS" type="datetime-local"> 结束 <input id="eE" type="datetime-local"> SSR+ <input id="eB" type="number" step="0.5" min="0" max="3"> <button class="ghost" onclick="addEv()">添加</button></div>
+    <p class="muted">单个活动最长 14 天，SSR 加成 0–3%。</p></div>
+  <div class="card"><h2>公告（显示在游戏扭蛋页与公示页）</h2><textarea id="ann" rows="2" style="width:100%" maxlength="280"></textarea></div>
+  <div class="card"><div class="row">修改说明 <input id="summary" style="flex:1" placeholder="例如：圣诞节 UP 星星喵"><button onclick="saveAll()">保存并发布</button></div><p id="msg"></p></div>
+  <div class="card"><h2>操作日志</h2><table id="log"></table></div>
+</div></div>
+<script>
+let TOKEN = sessionStorage.getItem('ms_tok') || '', S = null, cats = {}, pool = [];
+const $ = id => document.getElementById(id);
+const bj = t => new Date(t).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false});
+const isoLocal = v => v ? new Date(v).toISOString() : null;
+async function api(method, body) {
+  const r = await fetch('/api/admin/state', {method, headers:{'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json'}, body: body?JSON.stringify(body):undefined});
+  const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); return j;
+}
+async function login() { TOKEN = $('tok').value.trim(); try { await refresh(); sessionStorage.setItem('ms_tok', TOKEN); } catch(e) { $('lmsg').textContent = '登录失败：' + e.message; } }
+async function refresh() {
+  const [d, c] = await Promise.all([api('GET'), fetch('/api/cats').then(r=>r.json())]);
+  cats = Object.fromEntries(c.map(x=>[x.id,x])); S = d.settings; pool = d.ssrPool;
+  $('login').classList.add('hidden'); $('main').classList.remove('hidden');
+  ['SSR','SR','R','N'].forEach(k => $(k).value = S.rates[k]); $('pity').value = S.pity; $('rateUp').value = S.rateUp; $('gam').checked = S.guaranteeAfterMiss;
+  $('auto').checked = S.autoRotate; $('amb').checked = S.autoMonthlyBoost; $('ann').value = S.announcement || '';
+  $('excl').innerHTML = pool.map(id => `<label><input type="checkbox" data-ex="${id}" ${S.excludedFromRotation.includes(id)?'checked':''}> ${cats[id]?.zh||id}</label>`).join(' ');
+  const weeks = d.preview.banners.filter(b => b.end > Date.now());
+  $('weeks').innerHTML = '<tr><th>周</th><th>UP 猫</th><th>来源</th><th>备注</th></tr>' + weeks.map(b => {
+    const wk = new Date(b.start + 8*3600e3).toISOString().slice(0,10), o = S.overrides.find(x=>x.week===wk);
+    return `<tr><td>${wk}</td><td><select data-wk="${wk}"><option value="">自动（${cats[b.source==='auto'?b.catId:'']?.zh||'—'}）</option>${pool.map(id=>`<option value="${id}" ${o&&o.catId===id?'selected':''}>${cats[id]?.zh||id}</option>`).join('')}</select></td><td>${b.source==='manual'?'手动':'自动'}</td><td><input data-note="${wk}" value="${o?.note||''}"></td></tr>`; }).join('');
+  $('sched').innerHTML = S.scheduledRates.map((s,i) => `<div class="row">${bj(s.from)} 起 → SSR ${s.rates.SSR} / SR ${s.rates.SR} / R ${s.rates.R} / N ${s.rates.N}，保底 ${s.pity??S.pity} <button class="ghost" onclick="S.scheduledRates.splice(${i},1);refreshLists()">删除</button></div>`).join('') || '<p class="muted">无</p>';
+  $('evs').innerHTML = S.events.map((e,i) => `<div class="row">${e.title}：${bj(e.start)} — ${bj(e.end)}，SSR +${e.ssrBonus}% <button class="ghost" onclick="S.events.splice(${i},1);refreshLists()">删除</button></div>`).join('') || '<p class="muted">无手动活动</p>';
+  $('log').innerHTML = '<tr><th>时间</th><th>说明</th><th>字段</th><th>IP</th></tr>' + d.log.slice().reverse().map(l => `<tr><td>${bj(Date.parse(l.at))}</td><td>${l.summary}</td><td>${(l.changes||[]).join(', ')}</td><td>${l.ip||''}</td></tr>`).join('');
+  sum();
+}
+function refreshLists() { $('sched').innerHTML = S.scheduledRates.map(s => `<div class="row">${bj(s.from)} → SSR ${s.rates.SSR}（待保存）</div>`).join(''); $('evs').innerHTML = S.events.map(e => `<div class="row">${e.title}（待保存）</div>`).join(''); }
+function sum() { const t = ['SSR','SR','R','N'].reduce((a,k)=>a+Number($(k).value||0),0); $('sum').textContent = '合计 '+t.toFixed(1)+'%'; $('sum').className = Math.abs(t-100)<0.001?'ok':'err'; }
+['SSR','SR','R','N'].forEach(k => $(k).addEventListener('input', sum));
+function addSched() { S.scheduledRates.push({from: isoLocal($('sFrom').value), rates:{SSR:+$('sSSR').value, SR:+$('sSR2').value, R:+$('sR').value, N:+$('sN').value}, pity: $('sPity').value?+$('sPity').value:undefined}); refreshLists(); }
+function addEv() { S.events.push({title:$('eT').value||'活动', start:isoLocal($('eS').value), end:isoLocal($('eE').value), ssrBonus:+$('eB').value}); refreshLists(); }
+async function saveAll() {
+  const overrides = [...document.querySelectorAll('[data-wk]')].filter(s=>s.value).map(s=>({week:s.dataset.wk, catId:s.value, note:document.querySelector(`[data-note="${s.dataset.wk}"]`).value}));
+  const keep = S.overrides.filter(o => !document.querySelector(`[data-wk="${o.week}"]`));
+  const settings = { rates:{SSR:+$('SSR').value, SR:+$('SR').value, R:+$('R').value, N:+$('N').value}, pity:+$('pity').value, rateUp:+$('rateUp').value,
+    guaranteeAfterMiss:$('gam').checked, autoRotate:$('auto').checked, autoMonthlyBoost:$('amb').checked, announcement:$('ann').value,
+    excludedFromRotation:[...document.querySelectorAll('[data-ex]')].filter(c=>c.checked).map(c=>c.dataset.ex),
+    overrides: keep.concat(overrides), events:S.events, scheduledRates:S.scheduledRates };
+  try { await api('POST', {settings, summary:$('summary').value||'更新设置'}); $('msg').className='ok'; $('msg').textContent='已发布 ✓ 游戏将在下次打开扭蛋页时同步'; await refresh(); }
+  catch(e) { $('msg').className='err'; $('msg').textContent='保存失败：'+e.message; }
+}
+if (TOKEN) refresh().catch(()=>{});
+</script></body></html>

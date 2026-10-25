@@ -1,0 +1,240 @@
+[
+ {
+  "id": "mochi",
+  "zh": "麻薯",
+  "en": "Mochi",
+  "rarity": "N",
+  "exclusive": false
+ },
+ {
+  "id": "juzi",
+  "zh": "橘子",
+  "en": "Tangerine",
+  "rarity": "N",
+  "exclusive": false
+ },
+ {
+  "id": "coco",
+  "zh": "可可",
+  "en": "Cocoa",
+  "rarity": "N",
+  "exclusive": false
+ },
+ {
+  "id": "naitang",
+  "zh": "奶糖",
+  "en": "Toffee",
+  "rarity": "N",
+  "exclusive": false
+ },
+ {
+  "id": "doudou",
+  "zh": "豆豆",
+  "en": "Bean",
+  "rarity": "N",
+  "exclusive": false
+ },
+ {
+  "id": "latte",
+  "zh": "拿铁",
+  "en": "Latte",
+  "rarity": "R",
+  "exclusive": false
+ },
+ {
+  "id": "zhima",
+  "zh": "芝麻",
+  "en": "Sesame",
+  "rarity": "R",
+  "exclusive": false
+ },
+ {
+  "id": "pudding",
+  "zh": "布丁",
+  "en": "Pudding",
+  "rarity": "R",
+  "exclusive": false
+ },
+ {
+  "id": "yunduo",
+  "zh": "云朵",
+  "en": "Cloud",
+  "rarity": "R",
+  "exclusive": false
+ },
+ {
+  "id": "xiaohu",
+  "zh": "小虎",
+  "en": "Tiggy",
+  "rarity": "SR",
+  "exclusive": false
+ },
+ {
+  "id": "sherlock",
+  "zh": "福尔摩喵",
+  "en": "Sherlock",
+  "rarity": "SR",
+  "exclusive": false
+ },
+ {
+  "id": "momo",
+  "zh": "墨墨",
+  "en": "Shadow",
+  "rarity": "SR",
+  "exclusive": false
+ },
+ {
+  "id": "king",
+  "zh": "喵大王",
+  "en": "King",
+  "rarity": "SR",
+  "exclusive": false
+ },
+ {
+  "id": "stella",
+  "zh": "星星",
+  "en": "Stella",
+  "rarity": "SSR",
+  "exclusive": false
+ },
+ {
+  "id": "pirate",
+  "zh": "海盗船长",
+  "en": "Captain",
+  "rarity": "SSR",
+  "exclusive": false
+ },
+ {
+  "id": "astro",
+  "zh": "宇航喵",
+  "en": "Astro",
+  "rarity": "SSR",
+  "exclusive": false
+ },
+ {
+  "id": "cotton",
+  "zh": "棉花",
+  "en": "Cotton",
+  "rarity": "N",
+  "exclusive": false
+ },
+ {
+  "id": "dango",
+  "zh": "团子",
+  "en": "Dango",
+  "rarity": "N",
+  "exclusive": false
+ },
+ {
+  "id": "chef",
+  "zh": "大厨",
+  "en": "Chef",
+  "rarity": "N",
+  "exclusive": false
+ },
+ {
+  "id": "siam",
+  "zh": "暹罗",
+  "en": "Siam",
+  "rarity": "R",
+  "exclusive": false
+ },
+ {
+  "id": "tux",
+  "zh": "燕尾",
+  "en": "Tux",
+  "rarity": "R",
+  "exclusive": false
+ },
+ {
+  "id": "bengal",
+  "zh": "豹豹",
+  "en": "Bengal",
+  "rarity": "R",
+  "exclusive": false
+ },
+ {
+  "id": "beat",
+  "zh": "节拍喵",
+  "en": "Beat",
+  "rarity": "R",
+  "exclusive": false
+ },
+ {
+  "id": "tank",
+  "zh": "胖墩",
+  "en": "Tank",
+  "rarity": "R",
+  "exclusive": false
+ },
+ {
+  "id": "leo",
+  "zh": "狮王",
+  "en": "Leo",
+  "rarity": "SR",
+  "exclusive": false
+ },
+ {
+  "id": "pharaoh",
+  "zh": "法老",
+  "en": "Pharaoh",
+  "rarity": "SR",
+  "exclusive": false
+ },
+ {
+  "id": "ragdoll",
+  "zh": "布偶",
+  "en": "Ragdoll",
+  "rarity": "SR",
+  "exclusive": false
+ },
+ {
+  "id": "hex",
+  "zh": "小魔女",
+  "en": "Hex",
+  "rarity": "SR",
+  "exclusive": false
+ },
+ {
+  "id": "ronin",
+  "zh": "武士喵",
+  "en": "Ronin",
+  "rarity": "SR",
+  "exclusive": false
+ },
+ {
+  "id": "frosty",
+  "zh": "冰晶喵",
+  "en": "Frosty",
+  "rarity": "SSR",
+  "exclusive": false
+ },
+ {
+  "id": "nebula",
+  "zh": "星云喵",
+  "en": "Nebula",
+  "rarity": "SSR",
+  "exclusive": false
+ },
+ {
+  "id": "lucky",
+  "zh": "招财喵",
+  "en": "Lucky",
+  "rarity": "SR",
+  "exclusive": true
+ },
+ {
+  "id": "sakura",
+  "zh": "樱花喵",
+  "en": "Sakura",
+  "rarity": "SSR",
+  "exclusive": true
+ },
+ {
+  "id": "pumpkin",
+  "zh": "南瓜喵",
+  "en": "Pumpkin",
+  "rarity": "SSR",
+  "exclusive": true
+ }
+]
